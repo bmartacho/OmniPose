@@ -1,9 +1,10 @@
-# ------------------------------------------------------------------------------
-# Copyright (c) Microsoft
-# Licensed under the MIT License.
-# Written by Bin Xiao (Bin.Xiao@microsoft.com)
-# ------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -50,9 +51,3 @@ POSE_HIGH_RESOLUTION_NET.STAGE4.NUM_BLOCKS = [4, 4, 4, 4]
 POSE_HIGH_RESOLUTION_NET.STAGE4.NUM_CHANNELS = [32, 64, 128, 256]
 POSE_HIGH_RESOLUTION_NET.STAGE4.BLOCK = 'BASIC'
 POSE_HIGH_RESOLUTION_NET.STAGE4.FUSE_METHOD = 'SUM'
-
-
-MODEL_EXTRAS = {
-    'pose_resnet': POSE_RESNET,
-    'pose_high_resolution_net': POSE_HIGH_RESOLUTION_NET,
-}
