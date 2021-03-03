@@ -26,7 +26,7 @@ MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
   NUM_JOINTS: 16
-  PRETRAINED: 'models/coco/w48_384×288.pth'
+  PRETRAINED: 'weights/mpii/HRNet_w48/model_best'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 256
