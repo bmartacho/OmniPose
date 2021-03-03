@@ -1,8 +1,10 @@
-# ------------------------------------------------------------------------------
-# Copyright (c) Microsoft
-# Licensed under the MIT License.
-# Written by Bin Xiao (Bin.Xiao@microsoft.com)
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
 
 from __future__ import absolute_import
 from __future__ import division
@@ -15,7 +17,7 @@ import math
 import torch
 import torch.nn as nn
 
-# from models.wasp import build_wasp
+from models.wasp import build_wasp
 from models.wasp import WASPv2
 import torch.nn.functional as F
 
@@ -53,55 +55,37 @@ def conv3x3(in_planes, out_planes, stride=1):
     #                  padding=1, bias=False)
 
 
-# class Decoder(nn.Module):
-#     def __init__(self, low_level_inplanes, planes, num_classes):
-#         super(Decoder, self).__init__()
-#         reduction = planes // 8
+class Decoder(nn.Module):
+    def __init__(self, low_level_inplanes, planes, num_classes):
+        super(Decoder, self).__init__()
+        reduction = planes // 8
 
-#         self.conv1 = nn.Conv2d(low_level_inplanes, reduction, 1, bias=False)
-#         self.bn1 = nn.BatchNorm2d(reduction)
-#         self.relu = nn.ReLU()
-#         # self.conv2 = nn.Conv2d(planes, reduction, 1, bias=False)
-#         # self.bn2 = BatchNorm(256)
-#         self.last_conv = nn.Sequential(nn.Conv2d(planes+reduction, planes, kernel_size=3, stride=1, padding=1, bias=False),
-#                                        nn.BatchNorm2d(planes),
-#                                        nn.ReLU(),
-#                                        nn.Dropout(0.5),
-#                                        nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False),
-#                                        nn.BatchNorm2d(planes),
-#                                        nn.ReLU(),
-#                                        nn.Dropout(0.1),
-#                                        nn.Conv2d(planes, num_classes, kernel_size=1, stride=1))
+        self.conv1 = nn.Conv2d(low_level_inplanes, reduction, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(reduction)
+        self.relu = nn.ReLU()
+        # self.conv2 = nn.Conv2d(planes, reduction, 1, bias=False)
+        # self.bn2 = BatchNorm(256)
+        self.last_conv = nn.Sequential(nn.Conv2d(planes+reduction, planes, kernel_size=3, stride=1, padding=1, bias=False),
+                                       nn.BatchNorm2d(planes),
+                                       nn.ReLU(),
+                                       nn.Dropout(0.5),
+                                       nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False),
+                                       nn.BatchNorm2d(planes),
+                                       nn.ReLU(),
+                                       nn.Dropout(0.1),
+                                       nn.Conv2d(planes, num_classes, kernel_size=1, stride=1))
+        self._init_weight()
 
-#         # self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+    def forward(self, x, low_level_feat):
+        low_level_feat = self.conv1(low_level_feat)
+        low_level_feat = self.bn1(low_level_feat)
+        low_level_feat = self.relu(low_level_feat)
 
-#         self._init_weight()
+        x = F.interpolate(x, size=low_level_feat.size()[2:], mode='bilinear', align_corners=True)
+        x = torch.cat((x, low_level_feat), dim=1)
+        x = self.last_conv(x)
 
-
-#     # def forward(self, x, low_level_feat, level_2, level_3):
-#     def forward(self, x, low_level_feat):
-#         low_level_feat = self.conv1(low_level_feat)
-#         low_level_feat = self.bn1(low_level_feat)
-#         low_level_feat = self.relu(low_level_feat)
-        
-#         # level_2 = self.bn1(self.conv2(level_2))
-#         # level_3 = self.bn1(self.conv2(level_3))
-#         # x = self.bn2(x)
-#         # x = self.relu(x)
-
-#         # low_level_feat = self.maxpool(low_level_feat)
-
-#         x = F.interpolate(x, size=low_level_feat.size()[2:], mode='bilinear', align_corners=True)
-
-#         # x = self.gaussian_filtering(x)
-
-#         # x = torch.cat((x, low_level_feat, level_2, level_3), dim=1)
-#         x = torch.cat((x, low_level_feat), dim=1)
-#         x = self.last_conv(x)
-
-#         # x = self.maxpool(x)
-
-#         return x
+        return x
 
     def _init_weight(self):
         for m in self.modules():
@@ -361,66 +345,6 @@ class HighResolutionModule(nn.Module):
                         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
                         nn.ReLU(inplace=True),
                         self.gaussian_filter(num_inchannels[i], 3, 3)))
-                # elif j > i and (j-i) == 4:
-                #     fuse_layer.append(nn.Sequential(
-                #         nn.Conv2d(num_inchannels[j],
-                #                   num_inchannels[i],
-                #                   1,
-                #                   1,
-                #                   0,
-                #                   bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i]),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         self.gaussian_filter(num_inchannels[i], 3, 3)))
-
-                # if j > i:
-                #     fuse_layer.append(
-                #         nn.Sequential(
-                #             nn.Conv2d(
-                #                 num_inchannels[j],
-                #                 num_inchannels[i],
-                #                 1, 1, 0, bias=False
-                #             ),
-                #             nn.BatchNorm2d(num_inchannels[i]),
-                #             nn.Upsample(scale_factor=2**(j-i), mode='nearest'),
-                #             self.gaussian_filter(num_inchannels[i], 3, 3)
-                #         )
-                #     )
                 elif j == i:
                     fuse_layer.append(None)
                 else:
@@ -556,36 +480,13 @@ class PoseHighResolutionNet(nn.Module):
         self.stage4, pre_stage_channels = self._make_stage(
             self.stage4_cfg, num_channels)
 
-        # self.stage5_cfg = cfg['MODEL']['EXTRA']['STAGE5']
-        # num_channels = self.stage5_cfg['NUM_CHANNELS']
-        # block = blocks_dict[self.stage5_cfg['BLOCK']]
-        # num_channels = [
-        #     num_channels[i] * block.expansion for i in range(len(num_channels))
-        # ]
-        # self.transition4 = self._make_transition_layer(
-        #     pre_stage_channels, num_channels)
-        # self.stage5, pre_stage_channels = self._make_stage(
-        #     self.stage5_cfg, num_channels, multi_scale_output=False)
-
-        # After Stage 2
-        # self.wasp_48 = build_wasp(48, 48,[0,0])
-        # self.wasp_96 = build_wasp(96, 96,[0,0])
-
-        # After Stage 4
+        # If using WASPv1
         # self.wasp = build_wasp(48, 48,[0,0])
         # self.decoder = Decoder(256, 48, cfg.MODEL.NUM_JOINTS)
 
+        # If using WASPv2
         self.waspv2 = WASPv2(48, 48, cfg.MODEL.NUM_JOINTS)
-        # self.decoder = Decoder(48, 48, cfg.MODEL.NUM_JOINTS)
-
-        # self.final_layer = nn.Conv2d(
-        #     in_channels=pre_stage_channels[0],
-        #     out_channels=cfg.MODEL.NUM_JOINTS,
-        #     kernel_size=extra.FINAL_CONV_KERNEL,
-        #     stride=1,
-        #     padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0
-        # )
-
+        
         self.pretrained_layers = cfg['MODEL']['EXTRA']['PRETRAINED_LAYERS']
 
     def _make_transition_layer(
@@ -702,15 +603,6 @@ class PoseHighResolutionNet(nn.Module):
 
         level_2 = y_list[0]
 
-        # low_level_feat = y_list[0]
-
-        # for i in range(len(y_list)):
-        #     if i == 0:
-        #         y_list[i] = self.wasp_48(y_list[i])
-        #     else:
-        #         y_list[i] = self.wasp_96(y_list[i])
-
-
         x_list = []
         for i in range(self.stage3_cfg['NUM_BRANCHES']):
             if self.transition2[i] is not None:
@@ -730,36 +622,19 @@ class PoseHighResolutionNet(nn.Module):
                 x_list.append(y_list[i])
         y_list = self.stage4(x_list)
 
-        # x_list = []
-        # for i in range(self.stage5_cfg['NUM_BRANCHES']):
-        #     if self.transition4[i] is not None:
-        #         x_list.append(self.transition4[i](y_list[-1]))
-        #     else:
-        #         x_list.append(y_list[i])
-        # y_list = self.stage5(x_list)
-
-        # for i in range(len(y_list)):
-        #     y_list[i] = self.wasp(y_list[i])
-
-        # pre_decoder = self.wasp(y_list[0])
-
+        # If using WASPv1
         # x = self.decoder(pre_decoder,low_level_feat, level_2, level_3)
         # x = self.decoder(pre_decoder,low_level_feat)
 
+        # If using WASPv2
         x = self.waspv2(y_list[0], low_level_feat)
-
-        # x = self.final_layer(y_list[0])
-
-        # print(x.shape)
-        # quit()
-
+        
         return x
 
     def init_weights(self, pretrained=''):
         logger.info('=> init weights from normal distribution')
         for m in self.modules():
             if isinstance(m, SepConv2d):
-                # nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                 nn.init.normal_(m.weight, std=0.001)
                 for name, _ in m.named_parameters():
                     if name in ['bias']:
@@ -788,10 +663,7 @@ class PoseHighResolutionNet(nn.Module):
             raise ValueError('{} is not exist!'.format(pretrained))
 
 
-def get_pose_net(cfg, is_train, **kwargs):
+def get_omnipose(cfg, is_train, **kwargs):
     model = PoseHighResolutionNet(cfg, **kwargs)
-
-    # if is_train and cfg.MODEL.INIT_WEIGHTS:
-    #     model.init_weights(cfg.MODEL.PRETRAINED)
 
     return model
