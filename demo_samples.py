@@ -1,9 +1,10 @@
-# ------------------------------------------------------------------------------
-# Copyright (c) Microsoft
-# Licensed under the MIT License.
-# Written by Ke Sun (sunk@mail.ustc.edu.cn)
-# Modified by Depu Meng (mdp@mail.ustc.edu.cn)
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
 
 import argparse
 import numpy as np
@@ -53,12 +54,6 @@ color = [(252,176,243),(252,176,243),(252,176,243),
 link_pairs = [[15, 13], [13, 11], [16, 14], [14, 12], [11, 12], \
     [5, 11], [6, 12], [5, 6], [5, 7], [6, 8], [7, 9], \
     [8, 10], [1, 2], [0, 1], [0, 2], [1, 3], [2, 4], [0, 5], [0, 6]]
-
-# Red    = (240,  2,127)
-# Yellow = (255,255,  0)
-# Green  = (169,209,142)
-# Pink   = (252,176,243)
-# Blue   = (0,176,240)
 
 point_color = [(240,2,127),(240,2,127),(240,2,127), 
             (240,2,127), (240,2,127), 
@@ -136,9 +131,7 @@ def plot_COCO(data, gt_file, img_path, save_path,
             
             # Read Images
             img_file = img_path + img_name + '.jpg'
-            # print(img_file)
             data_numpy = cv2.imread(img_file, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
-            # print(data_numpy.shape)
             h = data_numpy.shape[0]
             w = data_numpy.shape[1]
             
@@ -155,7 +148,6 @@ def plot_COCO(data, gt_file, img_path, save_path,
 
                 # create bounds for ignore regions(double the gt bbox)
                 g = np.array(gt['keypoints'])
-                #xg = g[0::3]; yg = g[1::3]; 
                 vg = g[2::3]     
             
                 for i, dt in enumerate(dts):
@@ -194,10 +186,6 @@ def plot_COCO(data, gt_file, img_path, save_path,
                                     or vg[link_pair[0]] == 0 \
                                     or vg[link_pair[1]] == 0:
                                     continue
-                            # if k in range(6,11):
-                            #     lw = 1
-                            # else:
-                            #     lw = ref / 100.
                             lw = ref / 100.
                             line = mlines.Line2D(
                                     np.array([joints_dict[link_pair[0]][0],
@@ -255,10 +243,7 @@ def plot_MPII(data, gt_file, img_path, save_path,
 
     with open(gt_file) as f:
         gt = json.load(f)
-
-    # print(gt[0].keys())
-    print(preds.shape)
-
+        
     num_images = len(gt)
 
     for i in range(num_images):
@@ -285,10 +270,6 @@ def plot_MPII(data, gt_file, img_path, save_path,
                     or vg[link_pair[0]] == 0 \
                     or vg[link_pair[1]] == 0:
                     continue
-            # if k in range(6,11):
-            #     lw = 1
-            # else:
-            #     lw = ref / 100.
             lw = ref / 100.
             line = mlines.Line2D(
                     np.array([joints_dict[link_pair[0]][0],
@@ -374,9 +355,7 @@ def plot_MPII(data, gt_file, img_path, save_path,
             
             # Read Images
             img_file = img_path + img_name + '.jpg'
-            # print(img_file)
             data_numpy = cv2.imread(img_file, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
-            # print(data_numpy.shape)
             h = data_numpy.shape[0]
             w = data_numpy.shape[1]
             
@@ -393,7 +372,6 @@ def plot_MPII(data, gt_file, img_path, save_path,
 
                 # create bounds for ignore regions(double the gt bbox)
                 g = np.array(gt['keypoints'])
-                #xg = g[0::3]; yg = g[1::3]; 
                 vg = g[2::3]     
             
                 for i, dt in enumerate(dts):
@@ -432,10 +410,6 @@ def plot_MPII(data, gt_file, img_path, save_path,
                                     or vg[link_pair[0]] == 0 \
                                     or vg[link_pair[1]] == 0:
                                     continue
-                            # if k in range(6,11):
-                            #     lw = 1
-                            # else:
-                            #     lw = ref / 100.
                             lw = ref / 100.
                             line = mlines.Line2D(
                                     np.array([joints_dict[link_pair[0]][0],
