@@ -24,7 +24,7 @@ DATASET:
   TRAIN_SET: 'train2017'
 MODEL:
   INIT_WEIGHTS: true
-  NAME: pose_hrnet
+  NAME: omnipose
   NUM_JOINTS: 17
   PRETRAINED: 'output/coco/omnipose/OmniPose_HRw48_v2_128/checkpoint.pth'
   TARGET_TYPE: gaussian
