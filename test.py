@@ -1,9 +1,10 @@
-# ------------------------------------------------------------------------------
-# pose.pytorch
-# Copyright (c) 2018-present Microsoft
-# Licensed under The Apache-2.0 License [see LICENSE for details]
-# Written by Bin Xiao (Bin.Xiao@microsoft.com)
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
 
 from __future__ import absolute_import
 from __future__ import division
@@ -32,30 +33,29 @@ import cython
 
 import dataset
 import models
-from models.omnipose import OmniPose
-from models.omnipose import get_Canny_HRNet
-from models.frankenstein import get_frankenstein
-from models.pose_omni import get_pose_net
 
+from models.omnipose   import get_omnipose
+from models.pose_hrnet import get_pose_net
+
+import warnings
+warnings.filterwarnings("ignore") 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train keypoints network')
-    # general
-    parser.add_argument('--cfg', help='experiment configure file name',
-                        default='experiments/coco/hrnet/w48_384x288_adam_lr1e-3.yaml', type=str)
-    parser.add_argument('--opts', help="Modify config options using the command-line",
+    
+    parser.add_argument('--cfg',          help='experiment configure file name',
+                        default='experiments/mpii/hrnet/w48_256x256_adam_lr1e-3.yaml', type=str)
+    parser.add_argument('--opts',         help="Modify config options using the command-line",
                         default=None, nargs=argparse.REMAINDER)
-    parser.add_argument('--modelDir', help='model directory', type=str, default='')
-    parser.add_argument('--logDir', help='log directory', type=str, default='')
-    parser.add_argument('--dataDir', help='data directory', type=str, default='')
+    parser.add_argument('--modelDir',     help='model directory', type=str, default='')
+    parser.add_argument('--logDir',       help='log directory', type=str, default='')
+    parser.add_argument('--dataDir',      help='data directory', type=str, default='')
     parser.add_argument('--prevModelDir', help='prev Model directory', type=str, default='')
 
     args = parser.parse_args()
     return args
 
-
 def main(args):
-    # args = parse_args()
     update_config(cfg, args)
 
     logger, final_output_dir, tb_log_dir = create_logger(
@@ -69,12 +69,10 @@ def main(args):
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
 
-
-    # model = eval('models.pose_hrnet.get_pose_net')(cfg, is_train=False)
-    model = eval('models.pose_omni.get_pose_net')(cfg, is_train=False)
-    # model = OmniPose(cfg.MODEL.NUM_JOINTS)
-    # model = get_Canny_HRNet(48, cfg.MODEL.NUM_JOINTS, 0.1)
-    # model = get_frankenstein(cfg, False)
+    if cfg.MODEL.NAME == 'pose_hrnet':
+        model = get_pose_net(cfg, is_train=True)
+    elif cfg.MODEL.NAME == 'omnipose':
+        model = get_omnipose(cfg, is_train=True)
 
     if cfg.TEST.MODEL_FILE:
         logger.info("=> loading checkpoint '{}'".format(cfg.TEST.MODEL_FILE))
@@ -82,15 +80,11 @@ def main(args):
         begin_epoch = checkpoint['epoch']
         best_perf = checkpoint['perf']
         last_epoch = checkpoint['epoch']
-
-        # print(checkpoint.keys())
+        
+        print('Loading checkpoint with accuracy of 'checkpoint['perf'], 'at epoch ',checkpoint['epoch'])
 
         model_state_dict = model.state_dict()
         new_model_state_dict = {}
-
-        # for k in model_state_dict:
-        #     print(k)
-        # quit()
         
         for k in checkpoint['state_dict']:
             # print(k)
@@ -105,9 +99,6 @@ def main(args):
         print('best_perf', best_perf)
         print('last_epoch',last_epoch)
 
-        # model_state_dict.update(new_model_state_dict)
-        # model.load_state_dict(model_state_dict)
-
         model.load_state_dict(new_model_state_dict, strict=False)
     else:
         model_state_file = os.path.join(
@@ -115,7 +106,6 @@ def main(args):
         )
         model_state_file = 'models/coco/w48_384×288.pth'
         logger.info('=> loading model from {}'.format(model_state_file))
-        # model.load_state_dict(torch.load(model_state_file))
 
         model_state_dict = torch.load(model_state_file)
         new_model_state_dict = {}
@@ -127,31 +117,25 @@ def main(args):
 
         model.load_state_dict(new_model_state_dict)
 
-        # model.load_state_dict(checkclpoint['state_dict'])
-
     model = model.cuda()
 
     # define loss function (criterion) and optimizer
     criterion = JointsMSELoss(use_target_weight=cfg.LOSS.USE_TARGET_WEIGHT).cuda()
 
     # Data loading code
-    normalize = transforms.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-    )
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    
     valid_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
         cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False,
         transforms.Compose([
             transforms.ToTensor(),
-            normalize,
-        ])
-    )
+            normalize,]))
     valid_loader = torch.utils.data.DataLoader(
         valid_dataset,
         batch_size=cfg.TEST.BATCH_SIZE_PER_GPU,
         shuffle=False,
         num_workers=cfg.WORKERS,
-        pin_memory=True
-    )
+        pin_memory=True)
 
     # evaluate on validation set
     validate(cfg, valid_loader, valid_dataset, cfg.DATASET.DATASET, model, criterion,
