@@ -197,91 +197,6 @@ class HighResolutionModule(nn.Module):
         for i in range(num_branches if self.multi_scale_output else 1):
             fuse_layer = []
             for j in range(num_branches):
-                # if j > i and (j-i) == 1:
-                #     fuse_layer.append(nn.Sequential(
-                #         nn.Conv2d(num_inchannels[j],
-                #                   num_inchannels[i],
-                #                   1,
-                #                   1,
-                #                   0,
-                #                   bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i]),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         self.gaussian_filter(num_inchannels[i], 3, 3)))
-                # elif j > i and (j-i) == 2:
-                #     fuse_layer.append(nn.Sequential(
-                #         nn.Conv2d(num_inchannels[j],
-                #                   num_inchannels[i],
-                #                   1,
-                #                   1,
-                #                   0,
-                #                   bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i]),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         self.gaussian_filter(num_inchannels[i], 3, 3)))
-                # elif j > i and (j-i) == 3:
-                #     fuse_layer.append(nn.Sequential(
-                #         nn.Conv2d(num_inchannels[j],
-                #                   num_inchannels[i],
-                #                   1,
-                #                   1,
-                #                   0,
-                #                   bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i]),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         nn.ConvTranspose2d(in_channels=num_inchannels[i],
-                #                            out_channels=num_inchannels[i],
-                #                            kernel_size=3,
-                #                            stride=2,
-                #                            padding=1,
-                #                            output_padding=1,
-                #                            bias=False),
-                #         nn.BatchNorm2d(num_inchannels[i], momentum=0.1),
-                #         nn.ReLU(inplace=True),
-                #         self.gaussian_filter(num_inchannels[i], 3, 3)))
-
                 if j > i:
                     fuse_layer.append(
                         nn.Sequential(
@@ -329,27 +244,6 @@ class HighResolutionModule(nn.Module):
             fuse_layers.append(nn.ModuleList(fuse_layer))
 
         return nn.ModuleList(fuse_layers)
-
-    def gaussian_filter(self, channels, kernel_size, sigma):
-        x_cord = torch.arange(kernel_size)
-        x_grid = x_cord.repeat(kernel_size).view(kernel_size, kernel_size)
-        y_grid = x_grid.t()
-        xy_grid = torch.stack([x_grid, y_grid], dim=-1).float()
-        mean = (kernel_size - 1)/2
-
-        gaussian_kernel = (1./(2.*math.pi*sigma**2)) * torch.exp(-torch.sum((xy_grid - mean)**2., \
-                            dim=-1) / (2*sigma**2))
-        gaussian_kernel = gaussian_kernel / torch.sum(gaussian_kernel)
-        gaussian_kernel = gaussian_kernel.view(1, 1, kernel_size, kernel_size)
-        gaussian_kernel = gaussian_kernel.repeat(channels, 1, 1, 1)
-
-        gaussian_fltr = nn.Conv2d(in_channels=channels, out_channels=channels,
-                            kernel_size=kernel_size, padding=int(kernel_size//2), groups=channels, bias=False)
-
-        gaussian_fltr.weight.data = gaussian_kernel
-        gaussian_fltr.weight.requires_grad = False
-
-        return gaussian_fltr
 
     def get_num_inchannels(self):
         return self.num_inchannels
@@ -429,13 +323,6 @@ class PoseHighResolutionNet(nn.Module):
             pre_stage_channels, num_channels)
         self.stage4, pre_stage_channels = self._make_stage(
             self.stage4_cfg, num_channels, multi_scale_output=False)
-
-        # After Stage 2
-        # self.wasp_48 = build_wasp(48, 48,[0,0])
-        # self.wasp_96 = build_wasp(96, 96,[0,0])
-
-        # After Stage 4
-        # self.wasp = build_wasp(48, 48,[0,0])
 
         self.final_layer = nn.Conv2d(
             in_channels=pre_stage_channels[0],
@@ -540,8 +427,6 @@ class PoseHighResolutionNet(nn.Module):
         return nn.Sequential(*modules), num_inchannels
 
     def forward(self, x):
-        # print('Stage 0')
-        # print(x.shape)
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -549,9 +434,6 @@ class PoseHighResolutionNet(nn.Module):
         x = self.bn2(x)
         x = self.relu(x)
         x = self.layer1(x)
-
-        # print('Stage 1')
-        # print(x.shape)
 
         x_list = []
         for i in range(self.stage2_cfg['NUM_BRANCHES']):
@@ -561,15 +443,6 @@ class PoseHighResolutionNet(nn.Module):
                 x_list.append(x)
         y_list = self.stage2(x_list)
 
-        # print('Stage 2',len(y_list))
-        # for i in range(len(y_list)):
-        #     if i == 0:
-        #         y_list[i] = self.wasp_48(y_list[i])
-        #     else:
-        #         y_list[i] = self.wasp_96(y_list[i])
-            # print(y_list[i].shape)
-        # quit()
-
         x_list = []
         for i in range(self.stage3_cfg['NUM_BRANCHES']):
             if self.transition2[i] is not None:
@@ -577,10 +450,6 @@ class PoseHighResolutionNet(nn.Module):
             else:
                 x_list.append(y_list[i])
         y_list = self.stage3(x_list)
-
-        # print('Stage 3',len(y_list))
-        # for i in range(len(y_list)):
-        #     print(y_list[i].shape)
 
         x_list = []
         for i in range(self.stage4_cfg['NUM_BRANCHES']):
@@ -590,16 +459,7 @@ class PoseHighResolutionNet(nn.Module):
                 x_list.append(y_list[i])
         y_list = self.stage4(x_list)
 
-        # print('Stage 4',len(y_list))
-        # for i in range(len(y_list)):
-            # print(y_list[i].shape)
-            # y_list[i] = self.wasp(y_list[i])
-
         x = self.final_layer(y_list[0])
-
-        # print('Output',x.shape)
-
-        # quit()
 
         return x
 
@@ -607,7 +467,6 @@ class PoseHighResolutionNet(nn.Module):
         logger.info('=> init weights from normal distribution')
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                # nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                 nn.init.normal_(m.weight, std=0.001)
                 for name, _ in m.named_parameters():
                     if name in ['bias']:
