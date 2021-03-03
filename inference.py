@@ -1,9 +1,10 @@
-# ------------------------------------------------------------------------------
-# pose.pytorch
-# Copyright (c) 2018-present Microsoft
-# Licensed under The Apache-2.0 License [see LICENSE for details]
-# Written by Bin Xiao (Bin.Xiao@microsoft.com)
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
 
 from __future__ import absolute_import
 from __future__ import division
@@ -80,12 +81,6 @@ link_pairs = [[15, 13], [13, 11], [16, 14], [14, 12], [11, 12], \
     [5, 11], [6, 12], [5, 6], [5, 7], [6, 8], [7, 9], \
     [8, 10], [1, 2], [0, 1], [0, 2], [1, 3], [2, 4], [0, 5], [0, 6]]
 
-# Red    = (240,  2,127)
-# Yellow = (255,255,  0)
-# Green  = (169,209,142)
-# Pink   = (252,176,243)
-# Blue   = (0,176,240)
-
 point_color = [(240,2,127),(240,2,127),(240,2,127), 
             (240,2,127), (240,2,127), 
             (255,255,0),(169, 209, 142),
@@ -123,52 +118,10 @@ def map_joint_dict(joints):
         
     return joints_dict
 
-# plot_COCO_image(preds, img_path, save_path, colorstyle.link_pairs, colorstyle.ring_color, colorstyle.color_ids, save=True)
 def plot_COCO_image(preds, img_path, save_path, link_pairs, ring_color, color_ids, save=True):
-    
-    # joints
-    # coco = COCO(gt_file)
-    # coco_dt = coco.loadRes(data)
-    # coco_eval = COCOeval(coco, coco_dt, 'keypoints')
-    # coco_eval._prepare()
-    # gts_ = coco_eval._gts
-    # dts_ = coco_eval._dts
-    
-    # p = coco_eval.params
-    # p.imgIds = list(np.unique(p.imgIds))
-    # if p.useCats:
-    #     p.catIds = list(np.unique(p.catIds))
-    # p.maxDets = sorted(p.maxDets)
-
-    # print(preds.shape)
-    # print(preds)
-    # print(img_path)
-    # quit()
-
-    # loop through images, area range, max detection number
-    # catIds = p.catIds if p.useCats else [-1]
-    # threshold = 0.3
-    # joint_thres = 0.2
-    # for catId in catIds:
-    #     for imgId in p.imgIds:
-    #         # dimention here should be Nxm
-    #         gts = gts_[imgId, catId]
-    #         dts = dts_[imgId, catId]
-    #         inds = np.argsort([-d['score'] for d in dts], kind='mergesort')
-    #         dts = [dts[i] for i in inds]
-    #         if len(dts) > p.maxDets[-1]:
-    #             dts = dts[0:p.maxDets[-1]]
-    #         if len(gts) == 0 or len(dts) == 0:
-    #             continue
-            
-    #         sum_score = 0
-    #         num_box = 0
-    #         img_name = str(imgId).zfill(12)
-            
     # Read Images
     data_numpy = cv2.imread(img_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
     data_numpy = cv2.resize(data_numpy, (384,288), interpolation = cv2.INTER_AREA)
-    # print(data_numpy.shape)
     h = data_numpy.shape[0]
     w = data_numpy.shape[1]
     
@@ -177,26 +130,10 @@ def plot_COCO_image(preds, img_path, save_path, link_pairs, ring_color, color_id
     ax = plt.subplot(1,1,1)
     bk = plt.imshow(data_numpy[:,:,::-1])
     bk.set_zorder(-1)
-
-    # dt_joints = np.array(dt['keypoints']).reshape(17,-1)
-    # print(preds.shape)
     joints_dict = map_joint_dict(preds[0])
-    # print(joints_dict)
-    # quit()
     
     # stick 
     for k, link_pair in enumerate(link_pairs):
-        # if link_pair[0] in joints_dict \
-        # and link_pair[1] in joints_dict:
-            # if dt_joints[link_pair[0],2] < joint_thres \
-            #     or dt_joints[link_pair[1],2] < joint_thres \
-            #     or vg[link_pair[0]] == 0 \
-            #     or vg[link_pair[1]] == 0:
-            #     continue
-        # if k in range(6,11):
-        #     lw = 1
-        # else:
-        #     lw = ref / 100.
         lw = 2
         line = mlines.Line2D(
                 np.array([joints_dict[link_pair[0]][0],
@@ -208,10 +145,6 @@ def plot_COCO_image(preds, img_path, save_path, link_pairs, ring_color, color_id
         ax.add_line(line)
     # black ring
     for k in range(preds.shape[1]):
-        # if dt_joints[k,2] < joint_thres \
-        #     or vg[link_pair[0]] == 0 \
-        #     or vg[link_pair[1]] == 0:
-        #     continue
         if preds[0,k,0] > w or preds[0,k,1] > h:
             continue
         radius = 2
@@ -224,8 +157,6 @@ def plot_COCO_image(preds, img_path, save_path, link_pairs, ring_color, color_id
                                  linewidth=1)
         circle.set_zorder(1)
         ax.add_patch(circle)
-
-    # avg_score = (sum_score / (num_box+np.spacing(1)))*1000
 
     plt.gca().xaxis.set_major_locator(plt.NullLocator())
     plt.gca().yaxis.set_major_locator(plt.NullLocator())
@@ -293,7 +224,6 @@ def main(args):
         model_state_file = os.path.join(
             final_output_dir, 'final_state.pth'
         )
-        model_state_file = 'models/coco/w48_384×288.pth'
         logger.info('=> loading model from {}'.format(model_state_file))
 
         model_state_dict = torch.load(model_state_file)
@@ -309,55 +239,26 @@ def main(args):
     model = model.cuda()
 
     # Data loading code
-    normalize = transforms.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-    )
-    # valid_dataset = eval('dataset.'+cfg.DATASET.DATASET)(
-    #     cfg, cfg.DATASET.ROOT, cfg.DATASET.TEST_SET, False,
-    #     transforms.Compose([
-    #         transforms.ToTensor(),
-    #         normalize,
-    #     ])
-    # )
-    # valid_loader = torch.utils.data.DataLoader(
-    #     valid_dataset,
-    #     batch_size=cfg.TEST.BATCH_SIZE_PER_GPU,
-    #     shuffle=False,
-    #     num_workers=cfg.WORKERS,
-    #     pin_memory=True
-    # )
-
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     transform = transforms.Compose([transforms.ToTensor(),normalize,])
 
     model.eval()
 
     files_loc = '/home/bm3768/Desktop/research/dataset/NSL/9303/195KB_1'
     images = os.listdir(files_loc)
-    # print(images)
-    # quit()
 
     for idx in range(len(images)):
         print(idx,"/",len(images))
         img_path = os.path.join(files_loc,images[idx])
 
         data_numpy = cv2.imread(img_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
-
         data_numpy = cv2.resize(data_numpy, (384,288), interpolation = cv2.INTER_AREA)
-
-        # print(data_numpy.shape)
-
         data_numpy = cv2.cvtColor(data_numpy, cv2.COLOR_BGR2RGB)
 
-        # print(data_numpy.shape)
 
         data_numpy = transform(data_numpy)
-
-        # print(data_numpy.shape)
-
         input = torch.zeros((1,3,data_numpy.shape[1], data_numpy.shape[2]))
         input[0] = data_numpy
-
-        # print(input.shape)
 
         input = input.cuda()
 
@@ -368,31 +269,6 @@ def main(args):
         colorstyle = artacho_style
 
         plot_COCO_image(4*preds, img_path, 'samples/NSL/9303/195KB_1/'+images[idx], colorstyle.link_pairs, colorstyle.ring_color, colorstyle.color_ids, save=True)
-
-        # quit()
-
-        # print(outputs.shape)
-
-        # quit()
-
-        # center   = [184, 184]
-
-        # # img  = np.array(cv2.resize(cv2.imread(img_path),(368,368)), dtype=np.float32)
-        # img  = img.transpose(2, 0, 1)
-        # img  = torch.from_numpy(img)
-        # mean = [128.0, 128.0, 128.0]
-        # std  = [256.0, 256.0, 256.0]
-        # for t, m, s in zip(img, mean, std):
-        #     t.sub_(m).div_(s)
-
-        # img       = torch.unsqueeze(img, 0)
-
-        # self.model.eval()
-
-        # input_var   = img.cuda()
-
-        # heat, limbs = self.model(input_var)
-
 
 if __name__ == '__main__':
     arg = parse_args()
