@@ -27,7 +27,7 @@ MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
   NUM_JOINTS: 17
-  PRETRAINED: 'output/coco/pose_hrnet/baseline/w48_384x288_adam_lr1e-3/model_best.pth' #models/coco/w48_384×288.pth'
+  PRETRAINED: 'weights/coco/HRNet_w48/model_best.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 288
@@ -113,7 +113,7 @@ TEST:
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  MODEL_FILE: 'output/coco/omnipose/OmniPose_HRw48_v2/checkpoint.pth'
+  MODEL_FILE: ''
   NMS_THRE: 1.0
   OKS_THRE: 0.9
   USE_GT_BBOX: true
