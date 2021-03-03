@@ -1,18 +1,37 @@
-# # CFG='experiments/mpii/hrnet/w48_256x256_adam_lr1e-3.yaml'
-# CFG='experiments/coco/hrnet/w48_384x288_adam_lr1e-3.yaml'
+
+# ========================================= #
+# Choose one of the following Config files:
+# ========================================= #
+
+# ========================================= #
+#          OmniPose on MPII Dataset
+# ========================================= #
+# CFG='experiments/mpii/omnipose_w48_256x256yaml'
+
+# ========================================= #
+#          OmniPose on COCO Dataset
+# ========================================= #
+# CFG='experiments/coco/omnipose_w48_128x96.yaml'
+# CFG='experiments/coco/omnipose_w48_256x192.yaml'
+CFG='experiments/coco/omnipose_w48_384x288.yaml'
+
+# ========================================= #
+#            HRnet on MPII Dataset
+# ========================================= #
+# CFG='experiments/mpii/hrnet_w48_256x256yaml'
+
+# ========================================= #
+#             HRnet on COCO Dataset
+# ========================================= #
+# CFG='experiments/coco/hrnet_w48_128x96.yaml'
+# CFG='experiments/coco/hrnet_w48_256x192.yaml'
+# CFG='experiments/coco/hrnet_w48_384x288.yaml'
+
 # OPTS=None
 # MODELDIR=''
 # LOGDIR=''
 # DATADIR=''
 # PREVMODELDIR=''
-
-# python demo.py \
-#   --cfg="$CFG" \
-#   --opts="$OPTS" \
-#   --modelDir="$MODELDIR" \
-#   --logDir="$LOGDIR" \
-#   --dataDir="$DATADIR" \
-#   --prevModelDir="$PREVMODELDIR"
 
 # python demo_samples.py \
 # 	--dataset COCO \
