@@ -17,7 +17,7 @@ Our results on multiple datasets demonstrate that OmniPose, with an improved HRN
 We propose the upgraded “Waterfall Atrous Spatial Pyramid” module, shown in Figure 2. WASPv2 is a novel architecture with Atrous Convolutions that is able to leverage both the larger Field-of-View of the Atrous Spatial Pyramid Pooling configuration and the reduced size of the cascade approach.<br />
 
 <p align="center">
-  <img src="https://people.rit.edu/bm3768/images/WASPv2.png" width=500 title="WASPv2 module"><br />
+  <img src="https://people.rit.edu/bm3768/images/WASPv2.png" width=1000 title="WASPv2 module"><br />
   Figure 2: WASPv2 Module.
 </p><br />
 
