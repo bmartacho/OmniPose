@@ -24,7 +24,7 @@ DATASET:
   TRAIN_SET: train
 MODEL:
   INIT_WEIGHTS: true
-  NAME: pose_hrnet
+  NAME: omnipose
   NUM_JOINTS: 16
   PRETRAINED: 'models/coco/w48_384×288.pth'
   TARGET_TYPE: gaussian
