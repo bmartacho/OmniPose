@@ -24,7 +24,7 @@ We propose the upgraded “Waterfall Atrous Spatial Pyramid” module, shown in 
 Examples of the OmniPose architecture for Multi-Person Pose Estimation are shown in Figures 3.<br />
 
 <p align="center">
-  <img src="https://people.rit.edu/bm3768/images/supplemental.png" width=500 title="WASP module"><br />
+  <img src="https://people.rit.edu/bm3768/images/COCO_sample.png" width=500 title="WASP module"><br />
   Figure 3: Pose estimation samples for OmniPose.
   <br /><br />
   
@@ -41,7 +41,7 @@ Datasets used in this paper and required for training, validation, and testing c
 **Pre-trained Models:**
 <p align="justify">
 The pre-trained weights can be downloaded at
-  <a href="https://drive.google.com/drive/folders/1dPc7AayY2Pi3gjUURgozkuvlab5Vr-9n?usp=sharing">here</a>.
+  <a href="">here</a>.
 </p><br />
 
 
