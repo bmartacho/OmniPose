@@ -27,7 +27,7 @@ MODEL:
   INIT_WEIGHTS: true
   NAME: omnipose
   NUM_JOINTS: 17
-  PRETRAINED: 'weights/coco/OmniPose_w48_v2/checkpoint.pth'
+  PRETRAINED: 'weights/coco/OmniPose_w48_v2/model_best.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 288
