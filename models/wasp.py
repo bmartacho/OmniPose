@@ -1,3 +1,11 @@
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+
 import math
 import torch
 import torch.nn as nn
@@ -84,30 +92,8 @@ class wasp(nn.Module):
                                              nn.BatchNorm2d(planes),
                                              nn.ReLU())
 
-        # self.global_avg_pool = nn.Sequential(nn.Conv2d(inplanes, 256, 1, stride=1, bias=False),
-        #                                      nn.BatchNorm2d(256),
-        #                                      nn.ReLU())
         self.conv1 = nn.Conv2d(5*planes, planes, 1, bias=False)
         self.conv2 = nn.Conv2d(planes,planes,1,bias=False)
-        # self.conv2 = nn.ConvTranspose2d(
-        #             in_channels=planes,
-        #             out_channels=planes,
-        #             kernel_size=4,
-        #             stride=1,
-        #             padding=1,
-        #             output_padding=0,
-        #             bias=False,
-        #             dilation=upDilations[0])
-        # self.conv3 = nn.ConvTranspose2d(
-        #             in_channels=planes,
-        #             out_channels=planes,
-        #             kernel_size=4,
-        #             stride=1,
-        #             padding=1,
-        #             output_padding=0,
-        #             bias=False,
-        #             dilation=upDilations[1])
-        # fill_up_weights(self.conv3)
         self.bn1 = BatchNorm(planes)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.5)
@@ -128,11 +114,6 @@ class wasp(nn.Module):
         x2 = self.conv2(x2)
         x3 = self.conv2(x3)
         x4 = self.conv2(x4)
-        
-        # x1 = self.conv3(x1)
-        # x2 = self.conv3(x2)
-        # x3 = self.conv3(x3)
-        # x4 = self.conv3(x4)
 
         x5 = self.global_avg_pool(x)
         x5 = F.interpolate(x5, size=x4.size()[2:], mode='bilinear', align_corners=True)
@@ -147,8 +128,6 @@ class wasp(nn.Module):
     def _init_weight(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                # n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                # m.weight.data.normal_(0, math.sqrt(2. / n))
                 torch.nn.init.kaiming_normal_(m.weight)
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
@@ -201,37 +180,6 @@ class WASPv2(nn.Module):
                                        nn.ReLU(),
                                        nn.Conv2d(planes, n_classes, kernel_size=1, stride=1))
 
-        # =========================================== #
-        # Testing Gauss Interpolation for the Decoder
-        # =========================================== #
-        # self.gauss_interpolation = nn.Sequential(nn.ConvTranspose2d(n_classes,n_classes,3,stride=2,padding=1,output_padding=1,bias=False),
-        #                             nn.BatchNorm2d(n_classes, momentum=0.1), nn.ReLU(inplace=True), self.gaussian_filter(n_classes, 3, 3))
-        # =========================================== #
-        # 
-        # =========================================== #
-
-
-    def gaussian_filter(self, channels, kernel_size, sigma):
-        x_cord = torch.arange(kernel_size)
-        x_grid = x_cord.repeat(kernel_size).view(kernel_size, kernel_size)
-        y_grid = x_grid.t()
-        xy_grid = torch.stack([x_grid, y_grid], dim=-1).float()
-        mean = (kernel_size - 1)/2
-
-        gaussian_kernel = (1./(2.*math.pi*sigma**2)) * torch.exp(-torch.sum((xy_grid - mean)**2., \
-                            dim=-1) / (2*sigma**2))
-        gaussian_kernel = gaussian_kernel / torch.sum(gaussian_kernel)
-        gaussian_kernel = gaussian_kernel.view(1, 1, kernel_size, kernel_size)
-        gaussian_kernel = gaussian_kernel.repeat(channels, 1, 1, 1)
-
-        gaussian_fltr = nn.Conv2d(in_channels=channels, out_channels=channels,
-                            kernel_size=kernel_size, padding=int(kernel_size//2), groups=channels, bias=False)
-
-        gaussian_fltr.weight.data = gaussian_kernel
-        gaussian_fltr.weight.requires_grad = False
-
-        return gaussian_fltr   
-
     def forward(self, x, low_level_features):
         input = x
         x1 = self.aspp1(x)
@@ -255,6 +203,5 @@ class WASPv2(nn.Module):
         x = torch.cat((x, low_level_features), dim=1)
         x = self.last_conv(x)
         # x = F.interpolate(x, size=input.size()[2:], mode='bilinear', align_corners=True)
-        # x = self.gauss_interpolation(x)
 
         return x
