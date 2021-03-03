@@ -1,10 +1,10 @@
-
-# ------------------------------------------------------------------------------
-# Copyright (c) Microsoft
-# Licensed under the MIT License.
-# Written by Bin Xiao (Bin.Xiao@microsoft.com)
-# Modified by Hanbin Dai (daihanbin.ac@gmail.com) and Feng Zhang (zhangfengwcy@gmail.com)
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
+#                                    OmniPose                                    #
+#      Rochester Institute of Technology - Vision and Image Processing Lab       #
+#                      Bruno Artacho (bmartacho@mail.rit.edu)                    #
+# ------------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------------ #
 
 from __future__ import absolute_import
 from __future__ import division
@@ -156,6 +156,3 @@ def update_config(cfg, args):
 
 if __name__ == '__main__':
     import sys
-    # with open(sys.argv[1], 'w') as f:
-    #     print(_C, file=f)
-
