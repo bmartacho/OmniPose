@@ -485,7 +485,7 @@ class OmniPose(nn.Module):
         # self.decoder = Decoder(256, 48, cfg.MODEL.NUM_JOINTS)
 
         # If using WASPv2
-        self.waspv2 = WASPv2(48, 48, cfg.MODEL.NUM_JOINTS)
+        self.waspv2 = WASPv2('SEPARABLE', 48, 48, cfg.MODEL.NUM_JOINTS)
         
         self.pretrained_layers = cfg['MODEL']['EXTRA']['PRETRAINED_LAYERS']
 
