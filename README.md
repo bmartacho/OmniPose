@@ -50,7 +50,7 @@ The pre-trained weights for HRNet can be downloaded at
 **Data preparation:**
 
 **COCO**
-Download and extract them under {OMNIPOSE_ROOT}/data, as follows:
+Download the dataset and extract it at {OMNIPOSE_ROOT}/data, as follows:
 
     ${OMNIPOSE_ROOT}
     |-- data
@@ -63,7 +63,7 @@ Download and extract them under {OMNIPOSE_ROOT}/data, as follows:
                 `-- val2017.zip
                 
 **MPII**
-Download and extract them under {OMNIPOSE_ROOT}/data, as follows:
+Download the dataset and extract it at {OMNIPOSE_ROOT}/data, as follows:
 
     ${OMNIPOSE_ROOT}
     |-- data
