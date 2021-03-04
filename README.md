@@ -47,7 +47,33 @@ The pre-trained weights for HRNet can be downloaded at
   <a href="https://mailustceducn-my.sharepoint.com/personal/aa397601_mail_ustc_edu_cn/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Faa397601%5Fmail%5Fustc%5Fedu%5Fcn%2FDocuments%2FHRNet%2DBottom%2Dup%2DPose%2DEstimation%2Fmodel&originalPath=aHR0cHM6Ly9tYWlsdXN0Y2VkdWNuLW15LnNoYXJlcG9pbnQuY29tLzpmOi9nL3BlcnNvbmFsL2FhMzk3NjAxX21haWxfdXN0Y19lZHVfY24vRWdONEpjT0VfS05IcUc3Y29OT1RfYkFCWnZNV3BhSnhweTFKLTl5MWdkdUdjUT9ydGltZT1COWNHbWdQZjJFZw">here</a>.
 </p><br />
 
+**Data preparation:**
 
+**COCO**
+Download and extract them under {OMNIPOSE_ROOT}/data, as follows:
+
+    ${OMNIPOSE_ROOT}
+    |-- data
+    `-- |-- coco
+        `-- |-- annotations
+            |   |-- person_keypoints_train2017.json
+            |   `-- person_keypoints_val2017.json
+            `-- images
+                |-- train2017.zip
+                `-- val2017.zip
+                
+**MPII**
+Download and extract them under {OMNIPOSE_ROOT}/data, as follows:
+
+    ${OMNIPOSE_ROOT}
+    |-- data
+    `-- |-- mpii
+        `-- |-- annot
+            |   |-- train.json
+            |   `-- valid.json
+            `-- images
+              
+              
 **Contact:**
 
 <p align="justify">
