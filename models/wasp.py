@@ -11,12 +11,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-conv_dict = {
-    'CONV2D': nn.Conv2d,
-    'SEPARABLE': SepConv2d
-}
-
-
 def fill_up_weights(up):
     w = up.weight.data
     f = math.ceil(w.size(2) / 2)
@@ -29,10 +23,10 @@ def fill_up_weights(up):
         w[c, 0, :, :] = w[0, 0, :, :] 
 
 
-class SeparableConv2d(torch.nn.Module):
+class SepConv2d(torch.nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=0,
                  dilation=1, bias=True, padding_mode='zeros', depth_multiplier=1):
-        super(SeparableConv2d, self).__init__()
+        super(SepConv2d, self).__init__()
 
         intermediate_channels = in_channels * depth_multiplier
 
@@ -51,13 +45,16 @@ class SeparableConv2d(torch.nn.Module):
 
         return x
 
-class _AtrousModule(nn.Module):
-    def __init__(self, inplanes, planes, kernel_size, padding, dilation, BatchNorm):
-        super(_AtrousModule, self).__init__()
-        # self.atrous_conv = nn.Conv2d(inplanes, planes, kernel_size=kernel_size,
-        #             stride=1, padding=padding, dilation=dilation, bias=False)
+conv_dict = {
+    'CONV2D': nn.Conv2d,
+    'SEPARABLE': SepConv2d
+}
 
-        self.atrous_conv = SeparableConv2d(inplanes, planes, kernel_size=kernel_size,
+class _AtrousModule(nn.Module):
+    def __init__(self, conv_type, inplanes, planes, kernel_size, padding, dilation, BatchNorm):
+        super(_AtrousModule, self).__init__()
+        self.conv = conv_dict[conv_type]
+        self.atrous_conv = self.conv(inplanes, planes, kernel_size=kernel_size,
                             stride=1, padding=padding, dilation=dilation, bias=False, padding_mode='zeros', depth_multiplier=1)
 
         self.bn = BatchNorm(planes)
