@@ -11,6 +11,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+conv_dict = {
+    'CONV2D': nn.Conv2d,
+    'SEPARABLE': SepConv2d
+}
+
+
 def fill_up_weights(up):
     w = up.weight.data
     f = math.ceil(w.size(2) / 2)
@@ -142,21 +148,23 @@ def build_wasp(inplanes, planes, upDilations):
 
 
 class WASPv2(nn.Module):
-    def __init__(self, inplanes, planes, n_classes=17):
+    def __init__(self, conv_type, inplanes, planes, n_classes=17):
         super(WASPv2, self).__init__()
 
         # WASP
         dilations = [1, 6, 12, 18]
         # dilations = [1, 12, 24, 36]
+        
+        # convs = conv_dict[conv_type]
 
         reduction = planes // 8
 
         BatchNorm = nn.BatchNorm2d
 
-        self.aspp1 = _AtrousModule(inplanes, planes, 1, padding=0, dilation=dilations[0], BatchNorm=BatchNorm)
-        self.aspp2 = _AtrousModule(planes, planes, 3, padding=dilations[1], dilation=dilations[1], BatchNorm=BatchNorm)
-        self.aspp3 = _AtrousModule(planes, planes, 3, padding=dilations[2], dilation=dilations[2], BatchNorm=BatchNorm)
-        self.aspp4 = _AtrousModule(planes, planes, 3, padding=dilations[3], dilation=dilations[3], BatchNorm=BatchNorm)
+        self.aspp1 = _AtrousModule(conv_type, inplanes, planes, 1, padding=0, dilation=dilations[0], BatchNorm=BatchNorm)
+        self.aspp2 = _AtrousModule(conv_type, planes, planes, 3, padding=dilations[1], dilation=dilations[1], BatchNorm=BatchNorm)
+        self.aspp3 = _AtrousModule(conv_type, planes, planes, 3, padding=dilations[2], dilation=dilations[2], BatchNorm=BatchNorm)
+        self.aspp4 = _AtrousModule(conv_type, planes, planes, 3, padding=dilations[3], dilation=dilations[3], BatchNorm=BatchNorm)
 
         self.relu = nn.ReLU()
 
