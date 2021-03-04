@@ -55,7 +55,7 @@ class _AtrousModule(nn.Module):
         super(_AtrousModule, self).__init__()
         self.conv = conv_dict[conv_type]
         self.atrous_conv = self.conv(inplanes, planes, kernel_size=kernel_size,
-                            stride=1, padding=padding, dilation=dilation, bias=False, padding_mode='zeros', depth_multiplier=1)
+                            stride=1, padding=padding, dilation=dilation, bias=False, padding_mode='zeros')
 
         self.bn = BatchNorm(planes)
         self.relu = nn.ReLU()
