@@ -66,7 +66,7 @@ Andreas Savakis:<br />
 Artacho, B.; Savakis, A. UniPose: Unified Human Pose Estimation in Single Images and Videos. in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2020. <br />
 
 Latex:<br />
-@InProceedings{Artacho_2020_CVPR,<br />
+@InProceedings{Artacho_2021_ArXiv,<br />
   title = {OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation},<br />
   author = {Artacho, Bruno and Savakis, Andreas},<br />
   booktitle = {Arxiv},<br />
