@@ -21,6 +21,14 @@ from models.wasp import build_wasp
 from models.wasp import WASPv2
 import torch.nn.functional as F
 
+conv_dict = {
+    'CONV2D': nn.Conv2d,
+    'SEPARABLE': SepConv2d
+}
+
+# Change to the desired type of convolution
+convs = conv_dict['CONV2D']
+# convs = conv_dict['SEPARABLE']
 
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)
@@ -50,9 +58,7 @@ class SepConv2d(torch.nn.Module):
 
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
-    return SepConv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
-    # return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-    #                  padding=1, bias=False)
+    return convs(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
 
 
 class Decoder(nn.Module):
@@ -89,7 +95,7 @@ class Decoder(nn.Module):
 
     def _init_weight(self):
         for m in self.modules():
-            if isinstance(m, SepConv2d):
+            if isinstance(m, convs):
                 torch.nn.init.kaiming_normal_(m.weight)
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
@@ -133,14 +139,11 @@ class Bottleneck(nn.Module):
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(Bottleneck, self).__init__()
-        # self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.conv1 = SepConv2d(inplanes, planes, kernel_size=1, bias=False)
+        self.conv1 = convs(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes, momentum=BN_MOMENTUM)
-        # self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
-        self.conv2 = SepConv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2 = convs(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes, momentum=BN_MOMENTUM)
-        # self.conv3 = nn.Conv2d(planes, planes * self.expansion, kernel_size=1, bias=False)
-        self.conv3 = SepConv2d(planes, planes * self.expansion, kernel_size=1, bias=False)
+        self.conv3 = convs(planes, planes * self.expansion, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * self.expansion,
                                   momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=True)
@@ -214,7 +217,7 @@ class HighResolutionModule(nn.Module):
         if stride != 1 or \
            self.num_inchannels[branch_index] != num_channels[branch_index] * block.expansion:
             downsample = nn.Sequential(
-                SepConv2d(self.num_inchannels[branch_index],
+                convs(self.num_inchannels[branch_index],
                     num_channels[branch_index] * block.expansion,
                     kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(num_channels[branch_index] * block.expansion,
@@ -263,7 +266,7 @@ class HighResolutionModule(nn.Module):
             for j in range(num_branches):
                 if j > i and (j-i) == 1:
                     fuse_layer.append(nn.Sequential(
-                        SepConv2d(num_inchannels[j],
+                        convs(num_inchannels[j],
                                   num_inchannels[i],
                                   1,
                                   1,
@@ -282,7 +285,7 @@ class HighResolutionModule(nn.Module):
                         self.gaussian_filter(num_inchannels[i], 3, 3)))
                 elif j > i and (j-i) == 2:
                     fuse_layer.append(nn.Sequential(
-                        SepConv2d(num_inchannels[j],
+                        convs(num_inchannels[j],
                                   num_inchannels[i],
                                   1,
                                   1,
@@ -310,7 +313,7 @@ class HighResolutionModule(nn.Module):
                         self.gaussian_filter(num_inchannels[i], 3, 3)))
                 elif j > i and (j-i) == 3:
                     fuse_layer.append(nn.Sequential(
-                        SepConv2d(num_inchannels[j],
+                        convs(num_inchannels[j],
                                   num_inchannels[i],
                                   1,
                                   1,
@@ -354,7 +357,7 @@ class HighResolutionModule(nn.Module):
                             num_outchannels_conv3x3 = num_inchannels[i]
                             conv3x3s.append(
                                 nn.Sequential(
-                                    SepConv2d(
+                                    convs(
                                         num_inchannels[j],
                                         num_outchannels_conv3x3,
                                         3, 2, 1, bias=False
@@ -366,7 +369,7 @@ class HighResolutionModule(nn.Module):
                             num_outchannels_conv3x3 = num_inchannels[j]
                             conv3x3s.append(
                                 nn.Sequential(
-                                    SepConv2d(
+                                    convs(
                                         num_inchannels[j],
                                         num_outchannels_conv3x3,
                                         3, 2, 1, bias=False
@@ -431,19 +434,16 @@ blocks_dict = {
 }
 
 
-class PoseHighResolutionNet(nn.Module):
-
+class OmniPose(nn.Module):
     def __init__(self, cfg, **kwargs):
         self.inplanes = 64
         extra = cfg.MODEL.EXTRA
         super(PoseHighResolutionNet, self).__init__()
 
         # stem net
-        # self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1, bias=False)
-        self.conv1 = SepConv2d(3, 64, kernel_size=3, stride=2, padding=1, bias=False)
+        self.conv1 = convs(3, 64, kernel_size=3, stride=2, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
-        # self.conv2 = nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1, bias=False)
-        self.conv2 = SepConv2d(64, 64, kernel_size=3, stride=2, padding=1, bias=False)
+        self.conv2 = convs(64, 64, kernel_size=3, stride=2, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(Bottleneck, 64, 4)
@@ -500,7 +500,7 @@ class PoseHighResolutionNet(nn.Module):
                 if num_channels_cur_layer[i] != num_channels_pre_layer[i]:
                     transition_layers.append(
                         nn.Sequential(
-                            SepConv2d(
+                            convs(
                                 num_channels_pre_layer[i],
                                 num_channels_cur_layer[i],
                                 3, 1, 1, bias=False
@@ -519,7 +519,7 @@ class PoseHighResolutionNet(nn.Module):
                         if j == i-num_branches_pre else inchannels
                     conv3x3s.append(
                         nn.Sequential(
-                            SepConv2d(
+                            convs(
                                 inchannels, outchannels, 3, 2, 1, bias=False
                             ),
                             nn.BatchNorm2d(outchannels),
@@ -534,7 +534,7 @@ class PoseHighResolutionNet(nn.Module):
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
-                SepConv2d(
+                convs(
                     self.inplanes, planes * block.expansion,
                     kernel_size=1, stride=stride, bias=False
                 ),
@@ -634,7 +634,7 @@ class PoseHighResolutionNet(nn.Module):
     def init_weights(self, pretrained=''):
         logger.info('=> init weights from normal distribution')
         for m in self.modules():
-            if isinstance(m, SepConv2d):
+            if isinstance(m, convs):
                 nn.init.normal_(m.weight, std=0.001)
                 for name, _ in m.named_parameters():
                     if name in ['bias']:
@@ -664,6 +664,6 @@ class PoseHighResolutionNet(nn.Module):
 
 
 def get_omnipose(cfg, is_train, **kwargs):
-    model = PoseHighResolutionNet(cfg, **kwargs)
+    model = OmniPose(cfg, **kwargs)
 
     return model
