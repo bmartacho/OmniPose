@@ -21,15 +21,6 @@ from models.wasp import build_wasp
 from models.wasp import WASPv2
 import torch.nn.functional as F
 
-conv_dict = {
-    'CONV2D': nn.Conv2d,
-    'SEPARABLE': SepConv2d
-}
-
-# Change to the desired type of convolution
-convs = conv_dict['CONV2D']
-# convs = conv_dict['SEPARABLE']
-
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)
 
@@ -54,6 +45,15 @@ class SepConv2d(torch.nn.Module):
         x = self.pointConv(x)
 
         return x
+    
+conv_dict = {
+    'CONV2D': nn.Conv2d,
+    'SEPARABLE': SepConv2d
+}
+
+# Change to the desired type of convolution
+convs = conv_dict['CONV2D']
+# convs = conv_dict['SEPARABLE']
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -438,7 +438,7 @@ class OmniPose(nn.Module):
     def __init__(self, cfg, **kwargs):
         self.inplanes = 64
         extra = cfg.MODEL.EXTRA
-        super(PoseHighResolutionNet, self).__init__()
+        super(OmniPose, self).__init__()
 
         # stem net
         self.conv1 = convs(3, 64, kernel_size=3, stride=2, padding=1, bias=False)
