@@ -85,10 +85,10 @@ class wasp(nn.Module):
         dilations = [6, 12, 18, 24]
         BatchNorm = nn.BatchNorm2d
 
-        self.aspp1 = _AtrousModule(inplanes, planes, 1, padding=0, dilation=dilations[0], BatchNorm=BatchNorm)
-        self.aspp2 = _AtrousModule(planes, planes, 3, padding=dilations[1], dilation=dilations[1], BatchNorm=BatchNorm)
-        self.aspp3 = _AtrousModule(planes, planes, 3, padding=dilations[2], dilation=dilations[2], BatchNorm=BatchNorm)
-        self.aspp4 = _AtrousModule(planes, planes, 3, padding=dilations[3], dilation=dilations[3], BatchNorm=BatchNorm)
+        self.aspp1 = _AtrousModule('CONV2D', inplanes, planes, 1, padding=0, dilation=dilations[0], BatchNorm=BatchNorm)
+        self.aspp2 = _AtrousModule('CONV2D', planes, planes, 3, padding=dilations[1], dilation=dilations[1], BatchNorm=BatchNorm)
+        self.aspp3 = _AtrousModule('CONV2D', planes, planes, 3, padding=dilations[2], dilation=dilations[2], BatchNorm=BatchNorm)
+        self.aspp4 = _AtrousModule('CONV2D', planes, planes, 3, padding=dilations[3], dilation=dilations[3], BatchNorm=BatchNorm)
 
         self.global_avg_pool = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)),
                                              nn.Conv2d(inplanes, planes, 1, stride=1, bias=False),
