@@ -623,8 +623,8 @@ class OmniPose(nn.Module):
         y_list = self.stage4(x_list)
 
         # If using WASPv1
-        # x = self.decoder(pre_decoder,low_level_feat, level_2, level_3)
-        # x = self.decoder(pre_decoder,low_level_feat)
+#         x = self.wasp(y_list[0])
+#         x = self.decoder(x,low_level_feat)
 
         # If using WASPv2
         x = self.waspv2(y_list[0], low_level_feat)
