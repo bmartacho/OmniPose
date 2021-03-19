@@ -1,6 +1,6 @@
 # OmniPose
 
-  <a href="http://www.brunoartacho.com">**OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation**</a>.
+  <a href="https://arxiv.org/abs/2103.10180">**OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation**</a>.
 </p><br />
 
 <p align="center">
@@ -95,7 +95,9 @@ Latex:<br />
 @InProceedings{Artacho_2021_ArXiv,<br />
   title = {OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation},<br />
   author = {Artacho, Bruno and Savakis, Andreas},<br />
-  booktitle = {Arxiv},<br />
+  eprint={2103.10180},<br />
+  archivePrefix={arXiv},<br />
+  primaryClass={cs.CV},<br />
   year = {2021},<br />
 }<br />
 </p>
