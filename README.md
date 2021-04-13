@@ -73,27 +73,28 @@ Download the dataset and extract it at {OMNIPOSE_ROOT}/data, as follows:
             |   `-- valid.json
             `-- images
 
-**Training**
+#### Training
 <p align="justify">
 In order to train OmniPose uncomment the appropriate config file on 'run_train.sh' and run the following command:<br />
-     ```
-   bash run_train.sh
-   ```
+```
+bash run_train.sh
+```
 
-**Testing**
+#### Testing
 <p align="justify">
 In order to test OmniPose uncomment the appropriate config file on 'run_test.sh' and run the following command:<br />
-     ```
-   bash run_test.sh
-   ```
+```
+bash run_demo.sh
+```
 
-**Demo**
+#### Demo
 <p align="justify">
 In order to run demo of OmniPose on a sample image, uncomment the appropriate config file on 'run_demo.sh', and python command to the appropriate pre-trained dataset, and run the following command:<br />
-     ```
-   bash run_demo.sh
-   ```
-              
+```
+bash run_demo.sh
+```
+  
+  
 **Contact:**
 
 <p align="justify">
