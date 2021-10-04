@@ -33,6 +33,9 @@ CFG='experiments/coco/omnipose_w48_384x288.yaml'
 # DATADIR=''
 # PREVMODELDIR=''
 
+python inference.py \
+  --cfg="$CFG
+
 # python demo_samples.py \
 # 	--dataset COCO \
 #     --prediction output/coco/omnipose/OmniPose_HRw48_v2/results/keypoints_val2017_results_0.json \
