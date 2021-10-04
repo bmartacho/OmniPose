@@ -39,10 +39,9 @@ import cython
 
 import dataset
 import models
-from models.omnipose import OmniPose
+from models.omnipose import OmniPose, get_omnipose
 from models.omnipose import get_Canny_HRNet
 from models.frankenstein import get_frankenstein
-from models.pose_omni import get_pose_net
 from core.inference import get_final_preds_no_transform
 
 
@@ -199,7 +198,7 @@ def main(args):
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
 
-    model = eval('models.pose_omni.get_pose_net')(cfg, is_train=False)
+    model = eval('models.omnipose.get_omnipose')(cfg, is_train=False)
 
     if cfg.TEST.MODEL_FILE:
         logger.info("=> loading checkpoint '{}'".format(cfg.TEST.MODEL_FILE))
