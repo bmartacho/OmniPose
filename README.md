@@ -105,6 +105,20 @@ Andreas Savakis:<br />
 </p>
 
 **Citation:**
+```
+<p align="justify">
+Artacho, B.; Savakis, A. OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation. in ArXiv, 2021. <br />
+
+Latex:<br />
+@InProceedings{Artacho_2021_ArXiv,<br />
+  title = {OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation},<br />
+  author = {Artacho, Bruno and Savakis, Andreas},<br />
+  eprint={2103.10180},<br />
+  archivePrefix={arXiv},<br />
+  primaryClass={cs.CV},<br />
+  year = {2021},<br />
+}<br />
+</p>
 
 <p align="justify">
 Artacho, B.; Savakis, A. OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation. in ArXiv, 2021. <br />
@@ -119,3 +133,18 @@ Latex:<br />
   year = {2021},<br />
 }<br />
 </p>
+
+
+<p align="justify">
+Artacho, B.; Savakis, A. UniPose: Unified Human Pose Estimation in Single Images and Videos. in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2020. <br />
+
+Latex:<br />
+@InProceedings{Artacho_2020_CVPR,<br />
+  title = {UniPose: Unified Human Pose Estimation in Single Images and Videos},<br />
+  author = {Artacho, Bruno and Savakis, Andreas},<br />
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},<br />
+  month = {June},<br />
+  year = {2020},<br />
+}<br />
+</p>
+```
