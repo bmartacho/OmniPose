@@ -104,17 +104,40 @@ Andreas Savakis:<br />
   Website: https://www.rit.edu/directory/axseec-andreas-savakis<br /><br />
 </p>
 
-**Citation:**
-<p align="justify">
-Artacho, B.; Savakis, A. OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation. in ArXiv, 2021. <br />
 
-Latex:<br />
-@InProceedings{Artacho_2021_ArXiv,<br />
-  title = {OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation},<br />
-  author = {Artacho, Bruno and Savakis, Andreas},<br />
-  eprint={2103.10180},<br />
-  archivePrefix={arXiv},<br />
-  primaryClass={cs.CV},<br />
-  year = {2021},<br />
-}<br />
-</p>
+**Citation:**
+
+<p align="justify"> Artacho, B.; Savakis, A. OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation. in ArXiv, 2021. <br />
+
+```
+@InProceedings{Artacho_2021_ArXiv,
+  title = {OmniPose: A Multi-Scale Framework for Multi-Person Pose Estimation},
+  author = {Artacho, Bruno and Savakis, Andreas},
+  eprint={2103.10180},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  year = {2021},
+}
+```
+
+<p align="justify"> Artacho, B.; Savakis, A. UniPose+: A unified framework for 2D and 3D human pose estimation in images and videos. on IEEE Transactions on Pattern Analysis and Machine Intelligence, 2021. <br />
+
+```
+@article{Artacho_2021_PAMI,
+  title = {UniPose+: A unified framework for 2D and 3D human pose estimation in images and videos},
+  author = {Artacho, Bruno and Savakis, Andreas},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year = {2021},
+}
+```
+
+<p align="justify"> Artacho, B.; Savakis, A. UniPose: Unified Human Pose Estimation in Single Images and Videos. in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2020. <br />
+
+```
+@inproceedings{Artacho_2020_CVPR,
+title = {UniPose: Unified Human Pose Estimation in Single Images and Videos},
+author = {Artacho, Bruno and Savakis, Andreas},
+booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+year = {2020}
+}
+```
